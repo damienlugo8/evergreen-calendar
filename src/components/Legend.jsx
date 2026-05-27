@@ -1,5 +1,5 @@
 import React from 'react';
-import { EVENT_TYPE_META } from '../data/mockData';
+import { EVENT_TYPE_META } from '../constants';
 
 const Legend = () => (
   <div className="legend">

@@ -9,20 +9,30 @@ export const useCalendar = () => {
   today.setHours(0, 0, 0, 0);
 
   const [viewDate, setViewDate] = useState(
-    new Date(today.getFullYear(), today.getMonth(), 1)
+    new Date(today.getFullYear(), today.getMonth(), 1),
   );
-  const [events, setEvents] = useState([]);
+  const [events, setEvents]           = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState(null);
 
-  const loadEvents = useCallback(async () => {
-    setLoading(true);
-    const data = await calendarService.getEvents();
-    setEvents(data);
-    setLoading(false);
+  // Subscribe once on mount. onSnapshot fires immediately with current data,
+  // then re-fires whenever any team member adds or deletes an event.
+  useEffect(() => {
+    const unsubscribe = calendarService.subscribeToEvents(
+      (data) => {
+        setEvents(data);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        console.error('Firestore subscription error:', err);
+        setError('Unable to connect to the calendar. Check your Firebase config.');
+        setLoading(false);
+      },
+    );
+    return unsubscribe; // cleans up the listener on unmount
   }, []);
-
-  useEffect(() => { loadEvents(); }, [loadEvents]);
 
   const goToPrevMonth = () =>
     setViewDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
@@ -35,24 +45,23 @@ export const useCalendar = () => {
     setSelectedDate(toDateStr(today));
   };
 
-  const addEvent = async (eventData) => {
-    const newEvent = await calendarService.addEvent(eventData);
-    setEvents((prev) => [...prev, newEvent]);
-    return newEvent;
-  };
+  const addEvent = useCallback(async (eventData) => {
+    await calendarService.addEvent(eventData);
+    // No local state update needed — onSnapshot handles it for all clients.
+  }, []);
 
-  const deleteEvent = async (id) => {
+  const deleteEvent = useCallback(async (id) => {
     await calendarService.deleteEvent(id);
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-  };
+    // onSnapshot propagates the deletion to all clients.
+  }, []);
 
-  // Build the 6-row × 7-col grid for the current view month
-  const getDaysInMonth = () => {
+  // Build the 6-row × 7-col grid for the current view month.
+  const getDaysInMonth = useCallback(() => {
     const year  = viewDate.getFullYear();
     const month = viewDate.getMonth();
-    const firstDayOfWeek  = new Date(year, month, 1).getDay();
-    const totalDays       = new Date(year, month + 1, 0).getDate();
-    const prevMonthDays   = new Date(year, month, 0).getDate();
+    const firstDayOfWeek = new Date(year, month, 1).getDay();
+    const totalDays      = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays  = new Date(year, month, 0).getDate();
 
     const days = [];
 
@@ -68,7 +77,7 @@ export const useCalendar = () => {
     }
 
     return days;
-  };
+  }, [viewDate]);
 
   return {
     viewDate,
@@ -77,6 +86,7 @@ export const useCalendar = () => {
     events,
     selectedDate,
     loading,
+    error,
     setSelectedDate,
     goToPrevMonth,
     goToNextMonth,

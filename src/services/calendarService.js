@@ -1,30 +1,50 @@
-// calendarService.js — mock implementation (Phase 1)
+// calendarService.js — Firestore implementation (Phase 2).
 //
-// Phase 2: replace each function body with the equivalent Firebase
-// Firestore call. Function signatures and return shapes are intentionally
-// identical to what Firestore would return so the swap is surgical.
+// All reads use onSnapshot so every connected browser updates
+// the moment any team member writes to the "events" collection.
 
-import { MOCK_EVENTS } from '../data/mockData';
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { db } from '../firebase';
+import { EVENT_TYPE_META } from '../constants';
 
-// In-memory store — survives re-renders but resets on page reload
-let _store = [...MOCK_EVENTS];
+const COLLECTION = 'events';
 
-export const getEvents = async () => {
-  return [..._store];
+// Subscribe to all events. Returns the unsubscribe function — call it on
+// component unmount to avoid memory leaks.
+export const subscribeToEvents = (onUpdate, onError) => {
+  const q = query(collection(db, COLLECTION), orderBy('date', 'asc'));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const events = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      onUpdate(events);
+    },
+    onError,
+  );
 };
 
-export const addEvent = async (event) => {
-  const newEvent = { ...event, id: `evt-${Date.now()}` };
-  _store = [..._store, newEvent];
-  return newEvent;
-};
-
-export const updateEvent = async (id, updates) => {
-  _store = _store.map((e) => (e.id === id ? { ...e, ...updates } : e));
-  return _store.find((e) => e.id === id);
+// Write a new event. `title` is auto-derived from the event type so the
+// form only needs: type, date, createdBy, note.
+export const addEvent = async ({ type, date, createdBy, note }) => {
+  return addDoc(collection(db, COLLECTION), {
+    title:     EVENT_TYPE_META[type].label,
+    type,
+    date,
+    createdBy: createdBy || 'Team',
+    note:      note?.trim() || '',
+    createdAt: serverTimestamp(),
+  });
 };
 
 export const deleteEvent = async (id) => {
-  _store = _store.filter((e) => e.id !== id);
-  return id;
+  return deleteDoc(doc(db, COLLECTION, id));
 };

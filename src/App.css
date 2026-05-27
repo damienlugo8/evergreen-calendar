@@ -713,4 +713,409 @@
 
   .modal { border-radius: var(--r-lg); margin: 16px; }
   .field-row { grid-template-columns: 1fr; }
+
+  .header__user-name { display: none; }
+  .header__right { gap: 8px; }
+}
+
+
+/* ─────────────────────────────────────────────
+   Header — user pill + right group
+───────────────────────────────────────────── */
+.header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.header__user-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px 0 6px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.header__user-pill:hover {
+  border-color: var(--navy);
+  background: var(--navy-light);
+  color: var(--navy);
+}
+
+.header__user-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.header__user-name {
+  white-space: nowrap;
+}
+
+
+/* ─────────────────────────────────────────────
+   Loading screen enhancements
+───────────────────────────────────────────── */
+.loading {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.loading__text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  max-width: 340px;
+  padding: 24px;
+}
+.error-screen h2 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.error-screen p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+
+/* ─────────────────────────────────────────────
+   Panel — delete confirmation + new fields
+───────────────────────────────────────────── */
+.panel__event--confirming {
+  border-color: #FCA5A5;
+}
+
+.panel__confirm {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.panel__confirm-cancel {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--r-xs);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.panel__confirm-cancel:hover {
+  background: var(--beige);
+}
+
+.panel__confirm-delete {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--r-xs);
+  font-size: 12px;
+  font-weight: 600;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+  background: #FEF2F2;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.panel__confirm-delete:hover {
+  background: #FEE2E2;
+  border-color: #EF4444;
+}
+
+.panel__event-person {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.panel__event-note {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-light);
+}
+
+.panel__empty-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+
+/* ─────────────────────────────────────────────
+   Modal — updated form elements
+───────────────────────────────────────────── */
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.modal__head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal__user-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.modal__error {
+  font-size: 13px;
+  color: #DC2626;
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  line-height: 1.4;
+}
+
+.field__optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* Large type grid for the add-event modal */
+.type-grid--large {
+  gap: 8px;
+}
+
+.type-btn--large {
+  padding: 12px 14px;
+  font-size: 14px;
+  min-height: 48px;
+  justify-content: flex-start;
+}
+
+.type-btn__check {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Saving spinner inside button */
+.btn-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 6px;
+}
+
+
+/* ─────────────────────────────────────────────
+   Welcome / Name Modal
+───────────────────────────────────────────── */
+.overlay--welcome {
+  align-items: center;
+  background: rgba(15, 25, 35, 0.55);
+}
+
+.welcome-modal {
+  background: var(--white);
+  border-radius: var(--r-xl);
+  width: 100%;
+  max-width: 480px;
+  margin: 20px;
+  box-shadow: var(--shadow-lg);
+  animation: modal-up 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.welcome-modal__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 28px 0;
+}
+
+.welcome-modal__brand {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: -0.2px;
+}
+
+.welcome-modal__body {
+  padding: 20px 28px 28px;
+}
+
+.welcome-modal__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+
+.welcome-modal__subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 24px;
+}
+
+.welcome-modal__section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Name button grid */
+.name-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.name-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  min-height: 52px;
+}
+.name-btn:hover {
+  border-color: var(--navy);
+  background: var(--navy-light);
+  color: var(--navy);
+}
+.name-btn--active {
+  border-color: var(--navy);
+  background: var(--navy-light);
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.name-btn__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--beige-dark);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.name-btn--active .name-btn__avatar,
+.name-btn:hover .name-btn__avatar {
+  background: var(--navy);
+  color: #fff;
+}
+
+.name-btn__label { flex: 1; }
+
+.name-btn__check {
+  color: var(--navy);
+  flex-shrink: 0;
+}
+
+/* Divider */
+.welcome-modal__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.welcome-modal__divider::before,
+.welcome-modal__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-light);
+}
+
+.welcome-modal__custom-input {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.welcome-modal__cta {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.welcome-modal__cta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 420px) {
+  .name-grid { grid-template-columns: 1fr; }
+  .welcome-modal__title { font-size: 18px; }
 }
