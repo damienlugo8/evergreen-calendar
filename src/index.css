@@ -1,0 +1,90 @@
+:root {
+  /* Brand */
+  --navy:          #1E3A5F;
+  --navy-hover:    #2D5180;
+  --navy-light:    #EBF0F7;
+  --white:         #FFFFFF;
+  --beige:         #F5F0EB;
+  --beige-dark:    #EDE6DC;
+
+  /* Text */
+  --text-primary:  #0F1923;
+  --text-secondary:#52637A;
+  --text-muted:    #9BAAB8;
+
+  /* Borders */
+  --border:        #E8E3DC;
+  --border-light:  #F0ECE6;
+
+  /* Event palette — distinct but harmonious */
+  --c-meeting-dot: #3B82F6;
+  --c-meeting-bg:  #EEF4FF;
+  --c-meeting-tx:  #1D4ED8;
+
+  --c-timeoff-dot: #F59E0B;
+  --c-timeoff-bg:  #FFFBEB;
+  --c-timeoff-tx:  #B45309;
+
+  --c-wfh-dot:     #10B981;
+  --c-wfh-bg:      #ECFDF5;
+  --c-wfh-tx:      #047857;
+
+  --c-ooo-dot:     #8B5CF6;
+  --c-ooo-bg:      #F5F3FF;
+  --c-ooo-tx:      #6D28D9;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.06);
+
+  /* Radii */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-full: 9999px;
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--white);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  line-height: 1;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
