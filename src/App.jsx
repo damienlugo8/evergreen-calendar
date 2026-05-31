@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useCalendar } from './hooks/useCalendar';
 import Header from './components/Header';
 import Legend from './components/Legend';
@@ -6,7 +6,11 @@ import CalendarGrid from './components/CalendarGrid';
 import EventPanel from './components/EventPanel';
 import AddEventModal from './components/AddEventModal';
 import NameModal from './components/NameModal';
-import { LOCAL_STORAGE_KEY } from './constants';
+import TodayBanner from './components/TodayBanner';
+import FilterBar from './components/FilterBar';
+import AgendaSidebar from './components/AgendaSidebar';
+import { LOCAL_STORAGE_KEY, FILTER_STORAGE_KEY, TEAM_MEMBERS } from './constants';
+import { parseDateStr } from './utils/dates';
 import './App.css';
 
 const App = () => {
@@ -28,13 +32,61 @@ const App = () => {
 
   // ── Calendar state ────────────────────────────────────────────────────────
   const {
-    viewDate, todayStr, events, selectedDate, loading, error,
-    setSelectedDate, goToPrevMonth, goToNextMonth, goToToday,
+    viewDate, todayStr, events, selectedDate, loading, error, syncing,
+    setSelectedDate, goToPrevMonth, goToNextMonth, goToToday, jumpToMonth,
     addEvent, deleteEvent, getDaysInMonth,
   } = useCalendar();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalDate, setModalDate]       = useState(null);
+
+  // ── Filter by person ────────────────────────────────────────────────────
+  // This is a PER-DEVICE view preference, not synced. We seed it from this
+  // device's localStorage so each person's chosen view sticks on their own
+  // machine; it never touches Firestore or anyone else's calendar.
+  const [activeNames, setActiveNames] = useState(() => {
+    try {
+      const saved = localStorage.getItem(FILTER_STORAGE_KEY);
+      if (saved) return new Set(JSON.parse(saved));
+    } catch { /* ignore malformed storage */ }
+    return new Set(TEAM_MEMBERS);
+  });
+
+  // Persist the filter locally whenever it changes (this device only).
+  useEffect(() => {
+    try {
+      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify([...activeNames]));
+    } catch { /* storage may be unavailable; non-fatal */ }
+  }, [activeNames]);
+
+  const toggleName = useCallback((name) => {
+    setActiveNames((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  }, []);
+
+  // "All Team": when everyone is selected, clear it (show nothing). Otherwise
+  // select everyone (back to full calendar).
+  const toggleAll = useCallback(() => {
+    setActiveNames((prev) =>
+      prev.size === TEAM_MEMBERS.length ? new Set() : new Set(TEAM_MEMBERS),
+    );
+  }, []);
+
+  // Events visible after applying the person filter. People not on the
+  // hardcoded team (custom names) always show so nobody's events vanish.
+  const visibleEvents = useMemo(() => {
+    if (activeNames.size === TEAM_MEMBERS.length) return events;
+    return events.filter(
+      (e) => activeNames.has(e.createdBy) || !TEAM_MEMBERS.includes(e.createdBy),
+    );
+  }, [events, activeNames]);
+
+  // ── Agenda sidebar ────────────────────────────────────────────────────────
+  const [agendaCollapsed, setAgendaCollapsed] = useState(false);
 
   const days = getDaysInMonth();
 
@@ -42,11 +94,15 @@ const App = () => {
     setSelectedDate((prev) => (prev === dateStr ? null : dateStr));
   }, [setSelectedDate]);
 
-  const handleAddEvent = useCallback(() => {
+  const openAddModal = useCallback((dateStr) => {
     if (!currentUser) { setShowNameModal(true); return; }
-    setModalDate(selectedDate ? new Date(selectedDate + 'T00:00:00') : new Date());
+    setModalDate(dateStr ? parseDateStr(dateStr) : new Date());
     setShowAddModal(true);
-  }, [currentUser, selectedDate]);
+  }, [currentUser]);
+
+  const handleAddEvent = useCallback(() => {
+    openAddModal(selectedDate);
+  }, [openAddModal, selectedDate]);
 
   // ── Loading / error screens ───────────────────────────────────────────────
   if (loading) {
@@ -79,42 +135,69 @@ const App = () => {
   // ── Main UI ───────────────────────────────────────────────────────────────
   return (
     <>
-      <div className={`app${selectedDate ? ' app--panel' : ''}`}>
+      <div className="app">
         <Header
           viewDate={viewDate}
           onPrev={goToPrevMonth}
           onNext={goToNextMonth}
           onToday={goToToday}
+          onJump={jumpToMonth}
           onAddEvent={handleAddEvent}
           currentUser={currentUser}
           onChangeName={handleChangeName}
+          syncing={syncing}
+        />
+
+        <TodayBanner
+          events={events}
+          todayStr={todayStr}
+          onSelectToday={() => setSelectedDate(todayStr)}
+        />
+
+        <FilterBar
+          active={activeNames}
+          onToggle={toggleName}
+          onToggleAll={toggleAll}
         />
 
         <main className="app__main">
           <section className="app__calendar">
             <CalendarGrid
               days={days}
-              events={events}
+              events={visibleEvents}
               todayStr={todayStr}
               selectedDate={selectedDate}
               onDayClick={handleDayClick}
-              onEventClick={(ev) => setSelectedDate(ev.date)}
+              onEventClick={(ev) => setSelectedDate(ev.startDate || ev.date)}
             />
             <Legend />
           </section>
 
-          <EventPanel
-            selectedDate={selectedDate}
-            events={events}
-            onClose={() => setSelectedDate(null)}
-            onDelete={deleteEvent}
+          <AgendaSidebar
+            events={visibleEvents}
+            todayStr={todayStr}
+            collapsed={agendaCollapsed}
+            onToggle={() => setAgendaCollapsed((c) => !c)}
+            onSelectDay={(dateStr) => setSelectedDate(dateStr)}
           />
         </main>
+
+        <EventPanel
+          selectedDate={selectedDate}
+          events={events}
+          onClose={() => setSelectedDate(null)}
+          onDelete={deleteEvent}
+          onAddForDay={openAddModal}
+        />
       </div>
 
       {/* Name picker — shown on first visit or when user clicks their name */}
       {showNameModal && (
-        <NameModal onConfirm={handleNameConfirm} />
+        <NameModal
+          onConfirm={handleNameConfirm}
+          onClose={() => setShowNameModal(false)}
+          canClose={!!currentUser}
+        />
       )}
 
       {/* Add event modal */}

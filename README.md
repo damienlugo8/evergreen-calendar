@@ -1,16 +1,73 @@
-# React + Vite
+# Evergreen Calendar
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A shared team calendar for **Ibex Financial** — see who's in a meeting, taking time off, working from home, or out of office, all in real time.
 
-Currently, two official plugins are available:
+Built with React + Vite, powered by Firebase Firestore for live sync across the team.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Live sync** — events appear instantly for everyone on the team (no refresh)
+- **Four event types** — Meeting, Time Off, WFH, Out of Office
+- **Name picker** — pick your name on first visit; remembered after that
+- **Month view** with overflow handling
+- **Click any day** to see its events in the side panel
+- **Add / delete events** with one click
+- **Syncing indicator** when writes are in flight
+- **Mobile-friendly** — works on phones and tablets
 
-## Expanding the ESLint configuration
+## Team
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Marc · Damien · Dan · Michael · King · Jason · Richard
+
+## Tech Stack
+
+- React 19 + Vite
+- Firebase Firestore (`onSnapshot` for real-time subscriptions)
+- Vanilla CSS with design tokens
+- Inter font
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:5173.
+
+## Build
+
+```bash
+npm run build
+```
+
+Outputs a static SPA to `dist/`.
+
+## Deploy
+
+Deploy `dist/` to Vercel, Netlify, or Firebase Hosting.
+
+## Firestore Setup
+
+1. Create a Firebase project at https://console.firebase.google.com
+2. Add a Web app and copy the config into `src/firebase.js`
+3. Enable Firestore (production mode is fine)
+4. Paste the contents of `firestore.rules` into the Rules tab and publish
+
+## Microsoft Teams
+
+A Teams app manifest is included at `public/manifest.json` with matching icons (`icon-color.png`, `icon-outline.png`). Zip the manifest + icons and sideload via Teams Admin Center to expose Evergreen as a personal tab.
+
+## Project Structure
+
+```
+src/
+├── components/   UI components (Header, CalendarGrid, EventPanel, modals)
+├── hooks/        useCalendar — Firestore subscription + grid math
+├── services/     calendarService — Firestore add / delete / subscribe
+├── constants.js  Team list + event types
+├── firebase.js   Firebase config + Firestore instance
+└── App.jsx       Root layout
+```

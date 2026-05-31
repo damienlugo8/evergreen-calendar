@@ -3,7 +3,7 @@ import { TEAM_MEMBERS } from '../constants';
 
 // Shown once on first visit. Saves the chosen name to localStorage so the
 // user never has to pick again unless they clear their browser data.
-const NameModal = ({ onConfirm }) => {
+const NameModal = ({ onConfirm, onClose, canClose }) => {
   const [selected, setSelected] = useState('');
   const [custom, setCustom]     = useState('');
   const inputRef = useRef(null);
@@ -32,6 +32,18 @@ const NameModal = ({ onConfirm }) => {
   return (
     <div className="overlay overlay--welcome">
       <div className="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+        {canClose && (
+          <button
+            type="button"
+            className="welcome-modal__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
+        )}
         {/* Logo mark */}
         <div className="welcome-modal__logo">
           <svg width="44" height="44" viewBox="0 0 44 44" fill="none">

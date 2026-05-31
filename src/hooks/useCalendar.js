@@ -15,6 +15,7 @@ export const useCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
+  const [syncing, setSyncing]         = useState(false);
 
   // Subscribe once on mount. onSnapshot fires immediately with current data,
   // then re-fires whenever any team member adds or deletes an event.
@@ -40,19 +41,24 @@ export const useCalendar = () => {
   const goToNextMonth = () =>
     setViewDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
 
+  const jumpToMonth = (year, month) =>
+    setViewDate(new Date(year, month, 1));
+
   const goToToday = () => {
     setViewDate(new Date(today.getFullYear(), today.getMonth(), 1));
     setSelectedDate(toDateStr(today));
   };
 
   const addEvent = useCallback(async (eventData) => {
-    await calendarService.addEvent(eventData);
-    // No local state update needed — onSnapshot handles it for all clients.
+    setSyncing(true);
+    try { await calendarService.addEvent(eventData); }
+    finally { setSyncing(false); }
   }, []);
 
   const deleteEvent = useCallback(async (id) => {
-    await calendarService.deleteEvent(id);
-    // onSnapshot propagates the deletion to all clients.
+    setSyncing(true);
+    try { await calendarService.deleteEvent(id); }
+    finally { setSyncing(false); }
   }, []);
 
   // Build the 6-row × 7-col grid for the current view month.
@@ -87,10 +93,12 @@ export const useCalendar = () => {
     selectedDate,
     loading,
     error,
+    syncing,
     setSelectedDate,
     goToPrevMonth,
     goToNextMonth,
     goToToday,
+    jumpToMonth,
     addEvent,
     deleteEvent,
     getDaysInMonth,

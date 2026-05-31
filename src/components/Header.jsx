@@ -1,13 +1,12 @@
-import React from 'react';
-
-const MONTHS = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
-];
+import React, { useState } from 'react';
+import { MONTHS } from '../utils/dates';
+import MonthPicker from './MonthPicker';
 
 // currentUser: string name from localStorage
 // onChangeName: opens the NameModal again so user can switch
-const Header = ({ viewDate, onPrev, onNext, onToday, onAddEvent, currentUser, onChangeName }) => {
+const Header = ({ viewDate, onPrev, onNext, onToday, onJump, onAddEvent, currentUser, onChangeName, syncing }) => {
+  const [pickerOpen, setPickerOpen] = useState(false);
+
   return (
     <header className="header">
       <div className="header__brand">
@@ -28,20 +27,44 @@ const Header = ({ viewDate, onPrev, onNext, onToday, onAddEvent, currentUser, on
               <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
+
+          <div className="header__month-wrap">
+            <button
+              className="header__month-btn"
+              onClick={() => setPickerOpen((o) => !o)}
+              aria-haspopup="dialog"
+              aria-expanded={pickerOpen}
+            >
+              {MONTHS[viewDate.getMonth()]}
+              <span className="header__year">{viewDate.getFullYear()}</span>
+              <svg className="header__month-caret" width="11" height="11" viewBox="0 0 10 10" fill="none">
+                <path d="M2 4l3 3 3-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            {pickerOpen && (
+              <MonthPicker
+                viewDate={viewDate}
+                onJump={onJump}
+                onClose={() => setPickerOpen(false)}
+              />
+            )}
+          </div>
+
           <button className="header__arrow" onClick={onNext} aria-label="Next month">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
-        <h1 className="header__title">
-          {MONTHS[viewDate.getMonth()]}
-          <span className="header__year">{viewDate.getFullYear()}</span>
-        </h1>
       </div>
 
       <div className="header__right">
-        {/* Current user pill — click to change name */}
+        {syncing && (
+          <div className="header__sync" role="status" aria-live="polite">
+            <span className="header__sync-dot" />
+            <span>Syncing…</span>
+          </div>
+        )}
         {currentUser && (
           <button
             className="header__user-pill"

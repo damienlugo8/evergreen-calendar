@@ -20,6 +20,7 @@ const CalendarGrid = ({ days, events, todayStr, selectedDate, onDayClick, onEven
           key={i}
           day={day}
           events={events}
+          todayStr={todayStr}
           isToday={toDateStr(day.date) === todayStr}
           isSelected={toDateStr(day.date) === selectedDate}
           onClick={onDayClick}

@@ -17,21 +17,21 @@
   --border-light:  #F0ECE6;
 
   /* Event palette — distinct but harmonious */
-  --c-meeting-dot: #3B82F6;
-  --c-meeting-bg:  #EEF4FF;
-  --c-meeting-tx:  #1D4ED8;
+  --c-meeting-dot: #4A90A4;
+  --c-meeting-bg:  #EAF2F5;
+  --c-meeting-tx:  #2F6577;
 
-  --c-timeoff-dot: #F59E0B;
-  --c-timeoff-bg:  #FFFBEB;
-  --c-timeoff-tx:  #B45309;
+  --c-timeoff-dot: #D4876E;
+  --c-timeoff-bg:  #FBEEE8;
+  --c-timeoff-tx:  #9C5A42;
 
-  --c-wfh-dot:     #10B981;
-  --c-wfh-bg:      #ECFDF5;
-  --c-wfh-tx:      #047857;
+  --c-wfh-dot:     #A8B89C;
+  --c-wfh-bg:      #EFF2EC;
+  --c-wfh-tx:      #6B7A60;
 
-  --c-ooo-dot:     #8B5CF6;
-  --c-ooo-bg:      #F5F3FF;
-  --c-ooo-tx:      #6D28D9;
+  --c-ooo-dot:     #C5A572;
+  --c-ooo-bg:      #F7F1E4;
+  --c-ooo-tx:      #8A7142;
 
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);

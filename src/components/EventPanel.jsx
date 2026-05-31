@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { EVENT_TYPE_META } from '../constants';
+import { MONTHS_SHORT, DAYS_FULL, parseDateStr, eventsForDay, isMultiDay, formatRange, eventStart, eventEnd } from '../utils/dates';
 
-const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DAY_FULL    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-const EventPanel = ({ selectedDate, events, onClose, onDelete }) => {
+const EventPanel = ({ selectedDate, events, onClose, onDelete, onAddForDay }) => {
   const [confirmId, setConfirmId] = useState(null);
   const isOpen = Boolean(selectedDate);
 
@@ -12,12 +10,12 @@ const EventPanel = ({ selectedDate, events, onClose, onDelete }) => {
   let dayEvents = [];
 
   if (selectedDate) {
-    const d = new Date(selectedDate + 'T00:00:00');
+    const d = parseDateStr(selectedDate);
     header = {
-      dayName: DAY_FULL[d.getDay()],
-      display: `${MONTH_SHORT[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
+      dayName: DAYS_FULL[d.getDay()],
+      display: `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`,
     };
-    dayEvents = events.filter((e) => e.date === selectedDate);
+    dayEvents = eventsForDay(events, selectedDate);
   }
 
   const handleDelete = async (id) => {
@@ -27,7 +25,9 @@ const EventPanel = ({ selectedDate, events, onClose, onDelete }) => {
   };
 
   return (
-    <aside className={`panel${isOpen ? ' panel--open' : ''}`}>
+    <>
+      {isOpen && <div className="panel__backdrop" onClick={onClose} />}
+      <aside className={`panel${isOpen ? ' panel--open' : ''}`}>
       {isOpen && (
         <>
           <div className="panel__head">
@@ -39,6 +39,15 @@ const EventPanel = ({ selectedDate, events, onClose, onDelete }) => {
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
+            </button>
+          </div>
+
+          <div className="panel__add-row">
+            <button className="panel__add-btn" onClick={() => onAddForDay(selectedDate)}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+              </svg>
+              Add Event for this day
             </button>
           </div>
 
@@ -111,6 +120,17 @@ const EventPanel = ({ selectedDate, events, onClose, onDelete }) => {
                           </p>
                         )}
 
+                        {/* Date range for multi-day events */}
+                        {isMultiDay(event) && (
+                          <p className="panel__event-range">
+                            <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+                              <rect x="2" y="3" width="10" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.1"/>
+                              <path d="M2 6h10M5 1.5V4M9 1.5V4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                            </svg>
+                            {formatRange(eventStart(event), eventEnd(event))}
+                          </p>
+                        )}
+
                         {/* Optional note */}
                         {event.note && (
                           <p className="panel__event-note">{event.note}</p>
@@ -124,7 +144,8 @@ const EventPanel = ({ selectedDate, events, onClose, onDelete }) => {
           </div>
         </>
       )}
-    </aside>
+      </aside>
+    </>
   );
 };
 

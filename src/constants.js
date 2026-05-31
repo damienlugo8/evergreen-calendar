@@ -37,6 +37,11 @@ export const EVENT_TYPE_META = {
 };
 
 // Edit these names to match your actual team.
-export const TEAM_MEMBERS = ['King', 'Michael', 'Sarah', 'Marcus', 'Rachel'];
+export const TEAM_MEMBERS = ['Marc', 'Damien', 'Dan', 'Michael', 'King', 'Jason', 'Richard'];
 
 export const LOCAL_STORAGE_KEY = 'evg_user';
+
+// Per-device key for the "Show" person filter. This is a personal view
+// preference — it is saved locally on each device and is NEVER synced to
+// Firestore, so one person's filter never affects anyone else's calendar.
+export const FILTER_STORAGE_KEY = 'evg_filter';

@@ -33,12 +33,17 @@ export const subscribeToEvents = (onUpdate, onError) => {
 };
 
 // Write a new event. `title` is auto-derived from the event type so the
-// form only needs: type, date, createdBy, note.
-export const addEvent = async ({ type, date, createdBy, note }) => {
+// form only needs: type, date, createdBy, note. For multi-day events pass
+// startDate + endDate; `date` is kept = startDate for backward compatibility.
+export const addEvent = async ({ type, date, startDate, endDate, createdBy, note }) => {
+  const start = startDate || date;
+  const end   = endDate   || start;
   return addDoc(collection(db, COLLECTION), {
     title:     EVENT_TYPE_META[type].label,
     type,
-    date,
+    date:      start,        // legacy field — keeps old readers working
+    startDate: start,
+    endDate:   end,
     createdBy: createdBy || 'Team',
     note:      note?.trim() || '',
     createdAt: serverTimestamp(),

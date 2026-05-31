@@ -9,19 +9,32 @@ const toDateStr = (d) =>
 // Minimal form: type, date, note. Name is read from localStorage (passed as
 // currentUser) so the user never has to type it themselves.
 const AddEventModal = ({ onClose, onSave, initialDate, currentUser }) => {
-  const [type, setType]     = useState(EVENT_TYPES.MEETING);
-  const [date, setDate]     = useState(toDateStr(initialDate) || toDateStr(new Date()));
-  const [note, setNote]     = useState('');
-  const [saving, setSaving] = useState(false);
-  const [error, setError]   = useState('');
+  const start0 = toDateStr(initialDate) || toDateStr(new Date());
+  const [type, setType]       = useState(EVENT_TYPES.MEETING);
+  const [isRange, setIsRange] = useState(false);
+  const [date, setDate]       = useState(start0);
+  const [endDate, setEndDate] = useState(start0);
+  const [note, setNote]       = useState('');
+  const [saving, setSaving]   = useState(false);
+  const [error, setError]     = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!date) { setError('Please choose a date.'); return; }
+    if (isRange && endDate < date) {
+      setError('End date must be on or after the start date.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      await onSave({ type, date, createdBy: currentUser, note });
+      await onSave({
+        type,
+        startDate: date,
+        endDate: isRange ? endDate : date,
+        createdBy: currentUser,
+        note,
+      });
       onClose();
     } catch (err) {
       console.error('Failed to save event:', err);
@@ -84,18 +97,75 @@ const AddEventModal = ({ onClose, onSave, initialDate, currentUser }) => {
             </div>
           </div>
 
-          {/* Date */}
+          {/* Single day vs date range toggle */}
           <div className="field">
-            <label className="field__label" htmlFor="evt-date">Date</label>
-            <input
-              id="evt-date"
-              className="field__input"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
+            <label className="field__label">When?</label>
+            <div className="seg">
+              <button
+                type="button"
+                className={`seg__btn${!isRange ? ' seg__btn--active' : ''}`}
+                onClick={() => setIsRange(false)}
+                aria-pressed={!isRange}
+              >
+                Single Day
+              </button>
+              <button
+                type="button"
+                className={`seg__btn${isRange ? ' seg__btn--active' : ''}`}
+                onClick={() => {
+                  setIsRange(true);
+                  if (endDate < date) setEndDate(date);
+                }}
+                aria-pressed={isRange}
+              >
+                Date Range
+              </button>
+            </div>
           </div>
+
+          {/* Date(s) */}
+          {isRange ? (
+            <div className="field-row">
+              <div className="field">
+                <label className="field__label" htmlFor="evt-date">Start date</label>
+                <input
+                  id="evt-date"
+                  className="field__input"
+                  type="date"
+                  value={date}
+                  onChange={(e) => {
+                    setDate(e.target.value);
+                    if (endDate < e.target.value) setEndDate(e.target.value);
+                  }}
+                  required
+                />
+              </div>
+              <div className="field">
+                <label className="field__label" htmlFor="evt-end">End date</label>
+                <input
+                  id="evt-end"
+                  className="field__input"
+                  type="date"
+                  value={endDate}
+                  min={date}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="field">
+              <label className="field__label" htmlFor="evt-date">Date</label>
+              <input
+                id="evt-date"
+                className="field__input"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </div>
+          )}
 
           {/* Note (optional) */}
           <div className="field">
